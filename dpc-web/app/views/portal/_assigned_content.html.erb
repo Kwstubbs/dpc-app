@@ -32,7 +32,7 @@
         <%= link_to "Edit", edit_organization_url(organization), class: "ds-c-button ds-c-button--outline ds-c-button--small", data: { test: "edit-link" } %>
       <%end %>
     </div>
-
+    <%= debug @user.organizations %>
     <% if organization.reg_org.present? && organization.reg_org.enabled == true %>
       <section class="box">
         <div class="box__content">
@@ -48,19 +48,18 @@
             </div>
           </div>
           <div class="ds-l-row">
-            <%= form_tag "sort", method: "get" do %>
-              <svg class="icon ds-u-margin-right--1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <use xlink:href="/assets/solid.svg#filter"></use>
-              </svg>
-              <select name="client_token_sort" id="client_token_sort">
+            <%= form_tag "sort_tokens", method: "get", class: "sort_form_wrapper" do %>
+              <p class="ds-u-color--muted">
+                Sort By:
+              </p>
+              <select name="client_token_sort" id="client_token_sort" class="usa-select">
+                <option value>- Select -</option>
                 <option value="created_at">Created At</option>
                 <option value="name">Name</option>
               </select>
-
-            <p class="ds-u-color--muted">
-              Sort By:
-              <% submit_tag ('Filter')%>
-            </p>
+              <%= hidden_field_tag 'organization_id', organization.id%>
+              <%= submit_tag 'Ascending', class: "ds-c-button ds-c-button--outline ds-c-button--small"%>
+              <%= submit_tag 'Descending', class: "ds-c-button ds-c-button--outline ds-c-button--small"%>
             <% end %>
           </div>
           <div class="ds-l-row">

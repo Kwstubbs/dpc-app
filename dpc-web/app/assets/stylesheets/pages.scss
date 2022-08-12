@@ -1,3 +1,16 @@
 // Place all the styles related to the pages controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
+.sort_form_wrapper {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 43%;
+  margin-left: auto;
+}
+
+.sort_form_wrapper > * {
+  margin-left: 0.25rem;
+}

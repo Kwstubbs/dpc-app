@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   end
 
   match '/portal', to: 'portal#show', via: :get
-  match '/sort', to: 'portal#show', as: '/sort', via: :get
+  match '/sort_tokens', to: 'portal#sort_tokens', as: '/sort_tokens', via: :get
+  match '/sort_keys', to: 'portal#sort_keys', as: '/sort_keys', via: :get
 
   resources :organizations, only: [:edit, :update] do
     resources :client_tokens, only: [:new, :create, :destroy]
