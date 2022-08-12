@@ -48,6 +48,22 @@
             </div>
           </div>
           <div class="ds-l-row">
+            <%= form_tag "sort", method: "get" do %>
+              <svg class="icon ds-u-margin-right--1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <use xlink:href="/assets/solid.svg#filter"></use>
+              </svg>
+              <select name="client_token_sort" id="client_token_sort">
+                <option value="created_at">Created At</option>
+                <option value="name">Name</option>
+              </select>
+
+            <p class="ds-u-color--muted">
+              Sort By:
+              <% submit_tag ('Filter')%>
+            </p>
+            <% end %>
+          </div>
+          <div class="ds-l-row">
             <div class="ds-l-col--12">
                 <% if organization.reg_org.client_tokens.count == 0 %>
                   <p class="ds-u-color--muted">

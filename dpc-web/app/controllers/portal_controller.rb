@@ -6,4 +6,8 @@ class PortalController < ApplicationController
   def show
     @user = current_user
   end
+
+  def sort
+    puts params
+  end
 end
