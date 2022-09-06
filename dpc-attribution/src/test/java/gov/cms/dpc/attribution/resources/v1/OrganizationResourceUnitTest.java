@@ -5,6 +5,7 @@ import gov.cms.dpc.attribution.DPCAttributionConfiguration;
 import gov.cms.dpc.attribution.jdbi.EndpointDAO;
 import gov.cms.dpc.attribution.jdbi.OrganizationDAO;
 import gov.cms.dpc.common.entities.AddressEntity;
+import gov.cms.dpc.common.entities.EndpointEntity;
 import gov.cms.dpc.common.entities.OrganizationEntity;
 import gov.cms.dpc.fhir.DPCIdentifierSystem;
 import gov.cms.dpc.fhir.converters.FHIREntityConverter;
@@ -110,26 +111,14 @@ public class OrganizationResourceUnitTest {
 
     @Test
     void testUpdateOrganization() {
-//        final Organization originalOrg = generateFakeOrganization();
+        final OrganizationEntity originalOrgEntity = createTestOrgEntity();
 
-//        AttributionTestHelpers.createOrgResource(lookbackExemptOrgId, testUUID);
-//        List endpoints = new ArrayList<Endpoint>();
-//        endpoints.add(createFakeEndpoint());
-//        originalOrg.setEndpoint(endpoints);
+        Mockito.when(mockOrganizationDao.fetchOrganization(any())).thenReturn(Optional.ofNullable(originalOrgEntity));
 
-//        OrganizationEntity stuff = converter.fromFHIR(OrganizationEntity.class, originalOrg);
+        final Organization updatedOrg = generateFakeOrganization();
 
-        var originalOrg = createTestOrgEntity();
-
-        Mockito.when(mockOrganizationDao.fetchOrganization(any())).thenReturn(Optional.ofNullable(originalOrg));
-
-        final Organization updatedOrg = new Organization();
-        updatedOrg.setId(lookbackExemptOrgUuid);
-        updatedOrg.addIdentifier().setSystem(DPCIdentifierSystem.NPPES.getSystem()).setValue(testNpi);
-        updatedOrg.setName("Test Org");
-        updatedOrg.addAddress().addLine("54321 Real Street");
-
-        OrganizationEntity updatedOrgEntity = createUpdateTestOrgEntity();
+        // final OrganizationEntity updatedOrgEntity = createUpdateTestOrgEntity();
+        final OrganizationEntity updatedOrgEntity = this.converter.fromFHIR(OrganizationEntity.class, updatedOrg);
 
         Mockito.when(mockOrganizationDao.updateOrganization(UUID.fromString(lookbackExemptOrgUuid), updatedOrgEntity)).thenReturn(updatedOrgEntity);
 
@@ -160,13 +149,29 @@ public class OrganizationResourceUnitTest {
         return endpoint;
     }
 
+    private EndpointEntity createFakeEndpointEntity() {
+        EndpointEntity ep = new EndpointEntity();
+        ep.setStatus(Endpoint.EndpointStatus.TEST);
+        ep.setConnectionType(createConnectionType());
+        ep.setName("test-endpoint");
+        ep.setAddress("https://endpoint.test");
+        return ep;
+    }
+
+    private EndpointEntity.ConnectionType createConnectionType() {
+        EndpointEntity.ConnectionType ct = new EndpointEntity.ConnectionType();
+        ct.setCode("nothing");
+        ct.setSystem("http://nothing.com");
+        return ct;
+    }
+
     private Organization generateFakeOrganization() {
         final Organization organization = new Organization();
+        organization.setId(lookbackExemptOrgUuid);
+        organization.addIdentifier().setSystem(DPCIdentifierSystem.NPPES.getSystem()).setValue(testNpi);
+        organization.setName("Test Org");
+        organization.addAddress().addLine("54321 Real Street");
         organization.addEndpoint(new Reference("Endpoint/test-endpoint"));
-
-        organization.setId("test-organization");
-        organization.setName("Test Organization");
-
         return organization;
     }
 
@@ -182,6 +187,9 @@ public class OrganizationResourceUnitTest {
         org.setOrganizationID(createTestOrgId());
         org.setOrganizationName("Test Org");
         org.setOrganizationAddress(createTestAddressEntity());
+        ArrayList eps = new ArrayList<>();
+        eps.add(createFakeEndpointEntity());
+        org.setEndpoints(eps);
         return org;
     }
 
@@ -197,6 +205,9 @@ public class OrganizationResourceUnitTest {
         org.setOrganizationID(createTestOrgId());
         org.setOrganizationName("Test Org");
         org.setOrganizationAddress(createUpdateTestAddressEntity());
+        ArrayList eps = new ArrayList<>();
+        eps.add(createFakeEndpointEntity());
+        org.setEndpoints(eps);
         return org;
     }
 
