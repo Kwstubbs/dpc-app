@@ -5,6 +5,7 @@ import gov.cms.dpc.attribution.DPCAttributionConfiguration;
 import gov.cms.dpc.attribution.jdbi.EndpointDAO;
 import gov.cms.dpc.attribution.jdbi.OrganizationDAO;
 import gov.cms.dpc.common.entities.AddressEntity;
+import gov.cms.dpc.common.entities.ContactEntity;
 import gov.cms.dpc.common.entities.EndpointEntity;
 import gov.cms.dpc.common.entities.OrganizationEntity;
 import gov.cms.dpc.fhir.DPCIdentifierSystem;
@@ -19,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.sql.Array;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -112,15 +114,17 @@ public class OrganizationResourceUnitTest {
     @Test
     void testUpdateOrganization() {
         final OrganizationEntity originalOrgEntity = createTestOrgEntity();
-
+//        final var blah = converter.toFHIR(Organization.class, originalOrgEntity);
         Mockito.when(mockOrganizationDao.fetchOrganization(any())).thenReturn(Optional.ofNullable(originalOrgEntity));
 
         final Organization updatedOrg = generateFakeOrganization();
 
         // final OrganizationEntity updatedOrgEntity = createUpdateTestOrgEntity();
-        final OrganizationEntity updatedOrgEntity = this.converter.fromFHIR(OrganizationEntity.class, updatedOrg);
+        final OrganizationEntity updatedOrgEntity = converter.fromFHIR(OrganizationEntity.class, updatedOrg);
+        ArrayList eps = new ArrayList<>();
+        updatedOrgEntity.setEndpoints(eps);
 
-        Mockito.when(mockOrganizationDao.updateOrganization(UUID.fromString(lookbackExemptOrgUuid), updatedOrgEntity)).thenReturn(updatedOrgEntity);
+        Mockito.when(mockOrganizationDao.updateOrganization(Mockito.eq(UUID.fromString(lookbackExemptOrgUuid)), any())).thenReturn(updatedOrgEntity);
 
         Response updateResponse = resource.updateOrganization(UUID.fromString(lookbackExemptOrgUuid), updatedOrg);
         Organization updatedOrganization = (Organization) updateResponse.getEntity();
@@ -171,13 +175,14 @@ public class OrganizationResourceUnitTest {
         organization.addIdentifier().setSystem(DPCIdentifierSystem.NPPES.getSystem()).setValue(testNpi);
         organization.setName("Test Org");
         organization.addAddress().addLine("54321 Real Street");
-        organization.addEndpoint(new Reference("Endpoint/test-endpoint"));
+//        organization.addEndpoint(new Reference("Endpoint/test-endpoint"));
         return organization;
     }
 
     private OrganizationEntity.OrganizationID createTestOrgId() {
         OrganizationEntity.OrganizationID id = new OrganizationEntity.OrganizationID();
-        id.setValue(testNpi);
+        id.setValue(lookbackExemptOrgUuid);
+        id.setSystem(DPCIdentifierSystem.NPPES);
         return id;
     }
 
@@ -188,8 +193,10 @@ public class OrganizationResourceUnitTest {
         org.setOrganizationName("Test Org");
         org.setOrganizationAddress(createTestAddressEntity());
         ArrayList eps = new ArrayList<>();
-        eps.add(createFakeEndpointEntity());
+//        eps.add(createFakeEndpointEntity());
         org.setEndpoints(eps);
+        var contacts = new ArrayList<ContactEntity>();
+        org.setContacts(contacts);
         return org;
     }
 

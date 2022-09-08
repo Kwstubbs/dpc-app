@@ -15,7 +15,7 @@ import java.util.UUID;
 public class OrganizationDAO extends AbstractDAO<OrganizationEntity> {
 
     @Inject
-    OrganizationDAO(DPCManagedSessionFactory factory) {
+    public OrganizationDAO(DPCManagedSessionFactory factory) {
         super(factory.getSessionFactory());
     }
 
