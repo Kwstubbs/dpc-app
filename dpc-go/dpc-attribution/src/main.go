@@ -7,19 +7,21 @@ import (
 	"database/sql"
 	b64 "encoding/base64"
 	"fmt"
-	"github.com/CMSgov/dpc/attribution/client"
 	"net/http"
+
+	"github.com/CMSgov/dpc/attribution/client"
 
 	"github.com/CMSgov/dpc/attribution/conf"
 	"github.com/CMSgov/dpc/attribution/logger"
 	v1Repo "github.com/CMSgov/dpc/attribution/repository/v1"
 	"go.uber.org/zap"
 
+	"time"
+
 	"github.com/CMSgov/dpc/attribution/repository"
 	"github.com/CMSgov/dpc/attribution/router"
 	"github.com/CMSgov/dpc/attribution/service"
 	v1 "github.com/CMSgov/dpc/attribution/service/v1"
-	"time"
 )
 
 func main() {
@@ -68,7 +70,7 @@ func main() {
 	attributionRouter := router.NewDPCAttributionRouter(os, gs, is, ios, ds, js)
 	port := conf.GetAsString("port", "3001")
 
-	authType := conf.GetAsString("AUTH_TYPE", "TLS")
+	authType := conf.GetAsString("AUTH_TYPE", "NONE")
 
 	if authType == "NONE" {
 		startUnsecureServer(ctx, port, attributionRouter)
@@ -83,8 +85,8 @@ func main() {
 
 func startUnsecureServer(ctx context.Context, port string, handler http.Handler) {
 	server := http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
-		Handler: handler,
+		Addr:              fmt.Sprintf(":%s", port),
+		Handler:           handler,
 		ReadHeaderTimeout: 2 * time.Second,
 	}
 	fmt.Printf("Starting UNSECURE DPC-Attribution server on port %v ...\n", port)
@@ -124,9 +126,9 @@ func startSecureServer(ctx context.Context, port string, handler http.Handler, u
 	}
 
 	server := http.Server{
-		Addr:      fmt.Sprintf(":%s", port),
-		Handler:   handler,
-		TLSConfig: severConf,
+		Addr:              fmt.Sprintf(":%s", port),
+		Handler:           handler,
+		TLSConfig:         severConf,
 		ReadHeaderTimeout: 2 * time.Second,
 	}
 	//If cert and key file paths are not passed the certs in tls configs are used.

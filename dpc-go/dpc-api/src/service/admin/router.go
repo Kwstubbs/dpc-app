@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/CMSgov/dpc/api/client"
 	"github.com/CMSgov/dpc/api/conf"
 	middleware2 "github.com/CMSgov/dpc/api/middleware"
@@ -81,9 +82,9 @@ func NewAdminServer(ctx context.Context) *service.Server {
 		Retries:      conf.GetAsInt("ssas-client.attrRetries", 3),
 		ClientID:     conf.GetAsString("ssas-client.client-id"),
 		ClientSecret: conf.GetAsString("ssas-client.client-secret"),
-        CACert: conf.GetAsString("ssas-client.ca-cert"),
-        Cert: conf.GetAsString("ssas-client.cert"),
-        CertKey: conf.GetAsString("ssas-client.cert-key"),
+		CACert:       conf.GetAsString("ssas-client.ca-cert"),
+		Cert:         conf.GetAsString("ssas-client.cert"),
+		CertKey:      conf.GetAsString("ssas-client.cert-key"),
 	})
 
 	port := conf.GetAsInt("ADMIN_PORT", 3011)
@@ -96,7 +97,7 @@ func NewAdminServer(ctx context.Context) *service.Server {
 	}
 
 	r := buildAdminRoutes(controllers)
-	authType := conf.GetAsString("AUTH_TYPE", "TLS")
+	authType := conf.GetAsString("AUTH_TYPE", "NONE")
 	return service.NewServer("DPC-API Admin Server", port, authType, r)
 }
 
